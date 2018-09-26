@@ -1,0 +1,117 @@
+package project.data61;
+import java.lang.Object;
+import odf.*;
+import odf.InfoItemType.MetaData;
+
+import java.lang.Exception;
+import java.lang.Number;
+import java.text.NumberFormat;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Date;
+import java.util.Vector;
+import java.sql.Timestamp;
+
+import scala.concurrent.duration.*;
+import scala.concurrent.Future;
+import scala.concurrent.ExecutionContext;
+import scala.collection.JavaConversions;
+import scala.util.*;
+import akka.actor.Props;
+import akka.util.Timeout;
+import static akka.pattern.Patterns.ask;
+import akka.japi.Creator;
+import akka.dispatch.Mapper;
+import akka.dispatch.OnSuccess;
+import akka.dispatch.OnFailure;
+import akka.actor.Cancellable;
+
+import com.typesafe.config.Config;
+public class test {
+	public static final ObjectFactory odfcreator=new ObjectFactory();
+public static void main (String[] args) {
+	System.out.println(createSensorBox().toString());
+}
+
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+  
+ /* public ObjectType createOdf(){
+
+	  ObjectType object=odfcreator.createObjectType();
+   
+    //O-DF Object s as child of O-DF Objects
+    ObjectType objects = new ObjectType();
+    ((List<ValueType>) objects).add( createSensorBox() );
+    object.addObject(objects);
+    //Create O-DF Objects
+    return OdfFactory.createOdfObjects(objects); 
+  }*/
+
+  /**
+   * Method for creating O-DF Object for path Objects/ExampleRoom.
+   */
+ 
+  public static ObjectType createSensorBox(){
+   ObjectType me= odfcreator.createObjectType();
+   Description description =new Description();
+   description.setValue("waspmote");
+   me.setDescription(description);
+   
+
+  InfoItemType infoItems=createSensor();
+    
+    me.addInfoItem(infoItems);
+    
+  return(me);
+  }
+
+  /**
+   * Method for creating O-DF InfoItem for a sensor.
+   * @param name Name of the sensor.
+   * @param unit Unit of measured values.
+   * @param parentPath Path of parent O-DF Object.
+   */
+  public static InfoItemType createSensor(){
+	  String name="2600";
+	  String type="CO";
+	  String typeStr = "xs:double";
+	  String newValueStr = "2.60" ;
+	  
+      
+  
+      InfoItemType sensor=odfcreator.createInfoItemType();
+      sensor.setNameAttribute(name);
+	  
+      
+    ValueType value=new ValueType();
+	value.setType(type);
+	value.setValue(newValueStr);
+	 
+	ValueType meta=new ValueType();
+	
+	sensor.getValue().add(value);
+ 
+   return( sensor);
+   
+  }
+
+ 
+}

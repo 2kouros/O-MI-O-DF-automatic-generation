@@ -1,0 +1,171 @@
+package core;
+
+import odf.*;
+import omi.*;
+
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Result;
+
+import core.JenaReasoner;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Vector;
+
+public class Odfmessage {
+	
+	public static final ArrayList<String> FullDescription=JenaReasoner.getList();
+	public static final List<String> ObjectOneDescription=FullDescription.subList(0, 3);
+	public static final List<String> ObjectTwoDescription=FullDescription.subList(3, 6);
+	public static final List<String> ObjectThreeDescription=FullDescription.subList(6, 9);
+	public static final List<String> ObjectFourDescription=FullDescription.subList(9, 12);
+	public static final odf.ObjectFactory odfcreator=new odf.ObjectFactory();
+	public static final omi.ObjectFactory omicreator=new omi.ObjectFactory();
+	public final static String ODF = "odf";
+	
+	
+public static void main (String[] values) throws IOException, JAXBException, DatatypeConfigurationException, XMLStreamException, FactoryConfigurationError {
+	URL url = new URL("http://localhost:8181");
+	HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	connection.setDoOutput(true);
+	connection.setDoInput(true);
+	connection.setInstanceFollowRedirects(false);
+	connection.setRequestProperty("Content-Type", "text/xml");
+	
+	
+	OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream(),"UTF-8");
+	XMLStreamWriter xmlStreamWriter =
+	          XMLOutputFactory.newInstance().createXMLStreamWriter(os );
+	JAXBContext context = JAXBContext.newInstance("odf:omi");
+	  Marshaller marshaller = context.createMarshaller();
+	  Unmarshaller unmarshaller=context.createUnmarshaller();
+	  marshaller.setProperty("jaxb.formatted.output",Boolean.TRUE);
+	  marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "odf.xsd omi.xsd");
+	 
+	 ObjectType o= new ObjectType();
+       o.addObject(createSensorBox(values));
+	
+	  
+	OmiEnvelope envelope= omicreator.createOmiEnvelope();
+	WriteRequest write =omicreator.createWriteRequest();
+	write.setMsgformat(ODF);
+	write.setMsg(o);
+
+	
+	
+	
+	envelope.setWrite(write);
+	envelope.setTtl(10);
+	envelope.setVersion("1.0");
+
+   
+	
+	
+	 
+  
+   marshaller.marshal(envelope,System.out);
+   marshaller.marshal(envelope,xmlStreamWriter);
+    os.flush();
+  
+  
+   
+    
+}
+
+ 
+  public static ObjectType createSensorBox(String[] values) throws DatatypeConfigurationException{
+	  
+   ObjectType me= odfcreator.createObjectType();
+   QlmID d= new QlmID();
+   d.setValue("waspmote_gases");
+   me.getId().add(d);
+   Description description =new Description();
+   description.setValue("ODF message for my object");
+   me.setDescription(description);
+   
+
+   Vector<InfoItemType> infoItems = new Vector<InfoItemType>();
+   
+ 
+    infoItems.add(createSensor(ObjectOneDescription,values[0]));
+    infoItems.add(createSensor(ObjectTwoDescription,values[1]));
+    infoItems.add(createSensor(ObjectThreeDescription,values[2]));
+    infoItems.add(createSensor(ObjectFourDescription,values[3]));
+    infoItems.add(location("latitude",GPSclient.map.get("latitude")));
+    infoItems.add(location("longitude",GPSclient.map.get("longitude")));
+    infoItems.add(location("altitude",GPSclient.map.get("altitude")));
+    me.getInfoItem().addAll(infoItems);
+   
+    
+	return me;
+    
+  }
+
+  public static InfoItemType createSensor(List<String> desc,String val) throws DatatypeConfigurationException{
+	  
+      
+      Description d=new Description();
+      d.setValue(desc.get(2));
+      InfoItemType sensor=odfcreator.createInfoItemType();
+      sensor.setName(desc.get(0));
+	  sensor.setDescription(d);
+      
+	  
+    ValueType valuetype=odfcreator.createValueType();
+	valuetype.setType(desc.get(1));
+	valuetype.setValue(val);
+	valuetype.setDateTime(getXMLGregorianCalendarNow());
+	 
+	
+	
+	sensor.getValue().add(valuetype);
+ 
+   return( sensor);
+   
+  }
+  
+  public static InfoItemType location(String name, String value ) throws DatatypeConfigurationException{
+	  InfoItemType location =odfcreator.createInfoItemType();
+	  ValueType valuetype=odfcreator.createValueType();
+	  location.setName(name);
+      valuetype.setType("double");	  
+	  valuetype.setValue(value);
+	  valuetype.setDateTime(getXMLGregorianCalendarNow());
+	  location.getValue().add(valuetype);
+	  
+	  
+	return location;
+	}
+
+  public static XMLGregorianCalendar getXMLGregorianCalendarNow() 
+          throws DatatypeConfigurationException
+  {
+      GregorianCalendar gregorianCalendar = new GregorianCalendar();
+      DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
+      XMLGregorianCalendar now = 
+          datatypeFactory.newXMLGregorianCalendar(gregorianCalendar);
+      return now;
+  }
+  
+ }

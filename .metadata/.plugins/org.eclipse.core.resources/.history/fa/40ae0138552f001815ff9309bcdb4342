@@ -1,0 +1,61 @@
+package core;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+import akka.actor.UntypedActor;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
+import akka.io.Tcp.ConnectionClosed;
+import akka.io.Tcp.Received;
+
+public class SimplisticHandler extends UntypedActor {
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+  
+
+    @Override
+    public void onReceive(Object msg) throws Exception {
+        if (msg instanceof Received) {
+            final String data = ((Received) msg).data().utf8String();
+           if(data.startsWith("Data"))
+           {
+            
+           manipulate(data);
+            
+           }
+           else if(data.startsWith("ID")) {
+        	 String local=  data.replace("ID:", "");
+        	   JenaReasoner.sparqlQuery(local);
+        	   
+        	   
+           }
+           }
+          // getSender().tell(TcpMessage.write(ByteString.fromArray(("echo "+data).getBytes())), getSelf());
+      
+         
+        else if (msg instanceof ConnectionClosed) {
+        	log.info("In SimplisticHandlerActor - Connection close: " + msg);
+            getContext().stop(getSelf());
+        }
+    }
+
+	public void manipulate(String info) {
+		
+		String string;
+		string = info.replace("Data:", "");
+		String[] values =string.split(";");
+	//	project.data61.test.createSensorBox(values);
+		Sensor.Sensor(values);
+		System.out.println(values);
+		}
+		
+	
+		
+		
+
+		}
+    
+
+	
+	
+	

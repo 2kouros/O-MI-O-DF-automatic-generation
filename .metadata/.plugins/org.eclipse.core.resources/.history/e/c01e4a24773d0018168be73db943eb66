@@ -1,0 +1,31 @@
+package project.data61;
+import java.util.List;
+
+import com.ivkos.gpsd4j.client.GpsdClient;
+import com.ivkos.gpsd4j.client.GpsdClientOptions;
+import com.ivkos.gpsd4j.messages.DeviceMessage;
+import com.ivkos.gpsd4j.messages.PollMessage;
+import com.ivkos.gpsd4j.messages.reports.SKYReport;
+import com.ivkos.gpsd4j.messages.reports.TPVReport;
+public class gps {
+
+	public static void main(String[] args) {
+		
+		GpsdClient client =	new GpsdClient("192.168.1.2", 2947)
+	      .addErrorHandler(System.err::println)
+	      
+	     
+	      .start();
+		client.sendCommand(new PollMessage(), pollMessageResponse -> {
+		   List<TPVReport> activeDevices = pollMessageResponse.getTPVList();
+		});
+		
+		client.addHandler(TPVReport.class, tpv -> {
+	          Double lat = tpv.getLatitude();
+	          Double lon = tpv.getLongitude();
+
+	          System.out.printf("Lat: %f, Lon: %f\n", lat, lon);
+	      });
+	}
+
+}

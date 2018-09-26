@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;package-info.java&apos; to &apos;data61/src/main/java/odf&apos;&#x0D;&#x0A;- Original project: &apos;O-MI-master&apos;&#x0D;&#x0A;- Destination element: &apos;data61/src/main/java/odf&apos;&#x0D;&#x0A;- Original element: &apos;package-info.java&apos;" description="Copy file" destination="=data61/src\/main\/java&lt;odf" element1="O-MI-master/O-MI Node/src/main/java/parsing/xmlGen/odf/package-info.java" files="1" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1523072123539" units="0" version="1.0"/>
+</session>

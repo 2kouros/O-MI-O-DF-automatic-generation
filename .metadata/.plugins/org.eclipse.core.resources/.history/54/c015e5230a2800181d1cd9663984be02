@@ -1,0 +1,145 @@
+package project.data61;
+import java.lang.Object;
+import odf2.*;
+import odf.InfoItemType.MetaData;
+
+import java.lang.Exception;
+import java.lang.Number;
+import java.text.NumberFormat;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Date;
+import java.util.Vector;
+import java.sql.Timestamp;
+
+import scala.concurrent.duration.*;
+import scala.concurrent.Future;
+import scala.concurrent.ExecutionContext;
+import scala.collection.JavaConversions;
+import scala.util.*;
+import akka.actor.Props;
+import akka.util.Timeout;
+import static akka.pattern.Patterns.ask;
+import akka.japi.Creator;
+import akka.dispatch.Mapper;
+import akka.dispatch.OnSuccess;
+import akka.dispatch.OnFailure;
+import akka.actor.Cancellable;
+
+import com.typesafe.config.Config;
+public class test {
+	public static final ObjectFactory odfcreator=new ObjectFactory();
+public static void main (String[] args) {
+	
+}
+
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+  
+  public OdfObjects createOdf(){
+
+   
+    //O-DF Object s as child of O-DF Objects
+    Vector<OdfObject> objects = new Vector<OdfObject>();
+    objects.add( createExampleRoom() );
+    
+    //Create O-DF Objects
+    return OdfFactory.createOdfObjects(objects); 
+  }
+
+  /**
+   * Method for creating O-DF Object for path Objects/ExampleRoom.
+   */
+  public OdfObject createExampleRoom(){
+
+    Path path = new Path( "Objects/ExampleRoom" );
+
+    OdfDescription description = OdfFactory.createOdfDescription(
+        "Example room filled with examples"
+    );
+
+    //Child O-DF InfoItems of ExampleRoom
+    Vector<OdfInfoItem> infoItems = new Vector<OdfInfoItem>();
+    OdfInfoItem location = createLocation(path); 
+    infoItems.add(location);
+
+    //Child O-DF Object of ExampleRoom
+    Vector<OdfObject> objects = new Vector<OdfObject>();
+    objects.add( createSensorBox(path));
+
+    //Creata actual O-DF Object
+    return OdfFactory.createOdfObject(
+        path,
+        infoItems,
+        objects,
+        description
+    );
+  }
+
+  /**
+   * Method for creating O-DF Object for a SensorBox.
+   * @param parentPath Path of parent O-DF Object.
+   */
+  public JAXBElement<Object> createSensorBox(){
+ ObjectType me= new ObjectType();
+   Description description =new Description();
+   description.setValue("waspmote");
+   me.setDescription(description);
+   
+
+  JAXBElement<InfoItemType> infoItems=createSensor();
+    
+    me.addInfoItem(infoItems);
+    
+  return(odfcreator.createObject(me));
+  }
+
+  /**
+   * Method for creating O-DF InfoItem for a sensor.
+   * @param name Name of the sensor.
+   * @param unit Unit of measured values.
+   * @param parentPath Path of parent O-DF Object.
+   */
+  public InfoItemType createSensor(){
+	  String name="2600";
+	  String type="CO";
+	  String typeStr = "xs:double";
+	  String newValueStr = "2.60" ;
+	  
+      
+  
+      InfoItemType sensor=new InfoItemType();
+      sensor.setNameAttribute(name);
+	  
+      
+    ValueType value=new ValueType();
+	value.setType(type);
+	value.setValue(newValueStr);
+	 
+	ValueType meta=new ValueType();
+	
+	sensor.getValue().add(value);
+ 
+   return(odfcreator.createInfoItem(sensor));
+   
+  }
+
+ 
+}
